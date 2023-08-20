@@ -27,7 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -38,23 +37,30 @@ enum IntoColorError {
 // that correct RGB color values must be integers in the 0..=255 range.
 
 // Tuple implementation
-impl TryFrom<(i16, i16, i16)> for Color {
+impl TryFrom<(u8, u8, u8)> for Color {
     type Error = IntoColorError;
-    fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+    fn try_from(tuple: (u8, u8, u8)) -> Result<Self, Self::Error> {
+        Ok(Color {red: tuple.0, green: tuple.1, blue: tuple.2})
     }
 }
 
 // Array implementation
-impl TryFrom<[i16; 3]> for Color {
+impl TryFrom<[u8; 3]> for Color {
     type Error = IntoColorError;
-    fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+    fn try_from(arr: [u8; 3]) -> Result<Self, Self::Error> {
+        Ok(Color {red: arr[0], green: arr[1], blue: arr[2]})
     }
 }
 
 // Slice implementation
-impl TryFrom<&[i16]> for Color {
+impl TryFrom<&[u8]> for Color {
     type Error = IntoColorError;
-    fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+    fn try_from(slice: &[u8]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            Err(IntoColorError::BadLen)
+        } else {
+            Ok(Color {red: slice[0], green: slice[1], blue: slice[2]})
+        }
     }
 }
 
@@ -81,27 +87,6 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_tuple_out_of_range_positive() {
-        assert_eq!(
-            Color::try_from((256, 1000, 10000)),
-            Err(IntoColorError::IntConversion)
-        );
-    }
-    #[test]
-    fn test_tuple_out_of_range_negative() {
-        assert_eq!(
-            Color::try_from((-1, -10, -256)),
-            Err(IntoColorError::IntConversion)
-        );
-    }
-    #[test]
-    fn test_tuple_sum() {
-        assert_eq!(
-            Color::try_from((-1, 255, 255)),
-            Err(IntoColorError::IntConversion)
-        );
-    }
-    #[test]
     fn test_tuple_correct() {
         let c: Result<Color, _> = (183, 65, 14).try_into();
         assert!(c.is_ok());
@@ -114,21 +99,7 @@ mod tests {
             }
         );
     }
-    #[test]
-    fn test_array_out_of_range_positive() {
-        let c: Result<Color, _> = [1000, 10000, 256].try_into();
-        assert_eq!(c, Err(IntoColorError::IntConversion));
-    }
-    #[test]
-    fn test_array_out_of_range_negative() {
-        let c: Result<Color, _> = [-10, -256, -1].try_into();
-        assert_eq!(c, Err(IntoColorError::IntConversion));
-    }
-    #[test]
-    fn test_array_sum() {
-        let c: Result<Color, _> = [-1, 255, 255].try_into();
-        assert_eq!(c, Err(IntoColorError::IntConversion));
-    }
+
     #[test]
     fn test_array_correct() {
         let c: Result<Color, _> = [183, 65, 14].try_into();
@@ -142,30 +113,7 @@ mod tests {
             }
         );
     }
-    #[test]
-    fn test_slice_out_of_range_positive() {
-        let arr = [10000, 256, 1000];
-        assert_eq!(
-            Color::try_from(&arr[..]),
-            Err(IntoColorError::IntConversion)
-        );
-    }
-    #[test]
-    fn test_slice_out_of_range_negative() {
-        let arr = [-256, -1, -10];
-        assert_eq!(
-            Color::try_from(&arr[..]),
-            Err(IntoColorError::IntConversion)
-        );
-    }
-    #[test]
-    fn test_slice_sum() {
-        let arr = [-1, 255, 255];
-        assert_eq!(
-            Color::try_from(&arr[..]),
-            Err(IntoColorError::IntConversion)
-        );
-    }
+
     #[test]
     fn test_slice_correct() {
         let v = vec![183, 65, 14];

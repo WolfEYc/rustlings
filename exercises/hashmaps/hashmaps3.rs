@@ -41,7 +41,6 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
         // team_1.
         let team1 = scores.entry(team_1_name.clone()).or_insert(
             Team {
-                name: team_1_name.clone(),
                 ..Default::default()
             }
         );
@@ -51,7 +50,6 @@ fn build_scores_table(results: String) -> HashMap<String, Team> {
 
         let team2 = scores.entry(team_2_name.clone()).or_insert(
             Team {
-                name: team_2_name.clone(),
                 ..Default::default()
             }
         );
